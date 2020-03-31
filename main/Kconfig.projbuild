@@ -1,0 +1,23 @@
+menu "THINGSPEAK ESP CONFIGURATION"
+
+config WIFI_SSID
+    string "SSID"
+    default "my ssid"
+
+config WIFI_PASSWORD
+    string "PASSWORD"
+    default "my password"
+
+config THINGSPEAK_API_WRITE_KEY
+    string "ThingSpeak channel's API write key"
+    default "NOTSET"
+    help
+        The API Write key for your ThingSpeak channel
+
+config THINGSPEAK_API_READ_KEY
+    string "ThingSpeak channel's API write key"
+    default "NOTSET"
+    help
+        The API Write key for your ThingSpeak channel
+
+endmenu 
