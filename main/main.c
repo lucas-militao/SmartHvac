@@ -142,6 +142,7 @@ void app_main(void)
 {
   ds18b20_init(TEMPERATURE_SENSOR_PIN);
   configPresenceSensor();
+  ESP_LOGI("1","nova branch");
 
   readingQueue = xQueueCreate(sizeof(int), 10);
   wifiInit();
