@@ -1,4 +1,5 @@
 set(COMPONENT_SRCDIRS ".")
+set(EXTRA_COMPONENT_DIRS ".")
 set(COMPONENT_ADD_INCLUDEDIRS ".")
 
 register_component()

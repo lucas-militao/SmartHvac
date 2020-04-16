@@ -13,7 +13,8 @@
 #include "mqtt_client.h"
 #include "driver/gpio.h"
 #include "ds18b20.h"
-
+#include "esp_http_client.h"
+#include "http.h"
 
 #define TAG "MQTT" 
 #define SENSOR_DOOR_PIN 25 
@@ -80,9 +81,8 @@ void MQTTLogic(int sensorReading) {
     xTaskNotifyWait(0,0,&command, portMAX_DELAY);
     switch (command) {
       case WIFI_CONNEECTED:
-        client = esp_mqtt_client_init(&mqttConfig);
-        esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
-        esp_mqtt_client_start(client);
+        ESP_LOGI("WIFI", "CONECTADO");
+        httpInit();
         break;
       case MQTT_CONNEECTED:
         esp_mqtt_client_subscribe(client, "/topic/my/subscription/1", 2);
@@ -113,14 +113,6 @@ void OnConnected(void *para) {
       MQTTLogic(sensorReading);
     }
   }
-}
-
-void publishTemperatureReading() {
-
-}
-
-void publishPresenceReading() {
-
 }
 
 void generateReading(void *params) {
