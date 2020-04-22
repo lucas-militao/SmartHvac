@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -9,7 +10,9 @@
 
 #define TAG "HTTP"
 
-#define URL_BASE "api.thingspeak.com/"
+#define MAX_HTTP_OUTPUT_BUFFER 2048
+
+#define URL_BASE "https://api.thingspeak.com"
 #define URL_WRITE "https://api.thingspeak.com/update"
 #define KEY "5ZB65VGCLN1U6RR2"
 
@@ -47,19 +50,37 @@ static esp_err_t _http_event_handle(esp_http_client_event_t *evt)
 }
 
 void httpInit() {
+    char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
     esp_http_client_config_t config = {
         .url = URL_BASE,
+        .event_handler = _http_event_handle,
+        .user_data = local_response_buffer,        // Pass address of local buffer to get response
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
     ESP_ERROR_CHECK(esp_event_loop_init(_http_event_handle, NULL));
     esp_err_t err = esp_http_client_perform(client);
 
-    if (err == ESP_OK) {
-        ESP_LOGI(TAG, "Status = %d, content_length = %d",
-                esp_http_client_get_status_code(client),
-                esp_http_client_get_content_length(client));
-    }
+    // POST
+    // const char *post_data = "field1=value1&field2=value2";
+    // esp_http_client_set_url(client, "http://httpbin.org/post");
+    // esp_http_client_set_method(client, HTTP_METHOD_POST);
+    // esp_http_client_set_header(client, "Content-Type", "application/json");
+    // esp_http_client_set_post_field(client, post_data, strlen(post_data));
+    // err = esp_http_client_perform(client);
+    // if (err == ESP_OK) {
+    //     ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+    //             esp_http_client_get_status_code(client),
+    //             esp_http_client_get_content_length(client));
+    // } else {
+    //     ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
+    // }
+
+    // if (err == ESP_OK) {
+    //     ESP_LOGI(TAG, "Status = %d, content_length = %d",
+    //             esp_http_client_get_status_code(client),
+    //             esp_http_client_get_content_length(client));
+    // }
     esp_http_client_cleanup(client);
 }
 
