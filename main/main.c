@@ -25,7 +25,7 @@ int abacaxi = 0;
 
 const uint32_t WIFI_CONNEECTED = BIT1;
 
-void MQTTLogic() {
+void Logic() {
   uint32_t command = 0;
 
   while(true) {
@@ -43,19 +43,18 @@ void MQTTLogic() {
 void OnConnected(void *para) {
   while(true)
   {
-    int sensorReading;
-    if(xQueueReceive(readingQueue, &sensorReading, portMAX_DELAY)) {
+    int temperatura;
+    if(xQueueReceive(readingQueue, &temperatura, portMAX_DELAY)) {
       ESP_ERROR_CHECK(esp_wifi_start());
-      httpInit();
-      MQTTLogic();
+      Logic();
     }
   }
 }
 
 void generateReading(void *params) {
   while(true) {
-    int random = ds18b20_get_temp();
-    xQueueSend(readingQueue, &random, 2000 / portTICK_PERIOD_MS);
+    int temperatura = ds18b20_get_temp();
+    xQueueSend(readingQueue, &temperatura, 2000 / portTICK_PERIOD_MS);
   }
 }
 
@@ -71,9 +70,9 @@ void app_main(void)
 {
   ds18b20_init(TEMPERATURE_SENSOR_PIN);
   configPresenceSensor();
-
   readingQueue = xQueueCreate(sizeof(int), 10);
   wifiInit();
-  xTaskCreate(OnConnected, "handel commms", 1024 * 5, NULL, 5, &taskHandle);
-  xTaskCreate(generateReading, "handel commms", 1024 * 5, NULL, 5, NULL);
+  httpInit();
+  xTaskCreate(OnConnected, "conexaoWIfi", 1024 * 5, NULL, 5, &taskHandle);
+  xTaskCreate(generateReading, "Leitura", 1024 * 5, NULL, 5, NULL);
 }

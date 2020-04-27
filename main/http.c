@@ -12,7 +12,7 @@
 
 #define MAX_HTTP_OUTPUT_BUFFER 2048
 
-#define URL_BASE "https://api.thingspeak.com"
+#define URL_BASE "https://api.thingspeak.com/"
 #define URL_WRITE "https://api.thingspeak.com/update"
 #define KEY "5ZB65VGCLN1U6RR2"
 
@@ -37,7 +37,6 @@ static esp_err_t _http_event_handle(esp_http_client_event_t *evt)
             if (!esp_http_client_is_chunked_response(evt->client)) {
                 printf("%.*s", evt->data_len, (char*)evt->data);
             }
-
             break;
         case HTTP_EVENT_ON_FINISH:
             ESP_LOGI(TAG, "HTTP_EVENT_ON_FINISH");
@@ -51,10 +50,15 @@ static esp_err_t _http_event_handle(esp_http_client_event_t *evt)
 
 void httpInit() {
     char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
+    // esp_http_client_config_t config = {
+    //     .url = URL_BASE,
+    //     .event_handler = _http_event_handle,
+    //     .user_data = local_response_buffer,        // Pass address of local buffer to get response
+    // };
+
     esp_http_client_config_t config = {
-        .url = URL_BASE,
-        .event_handler = _http_event_handle,
-        .user_data = local_response_buffer,        // Pass address of local buffer to get response
+        .url = URL_BASE,        // Pass address of local buffer to get response
+        .event_handler = _http_event_handle
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
@@ -81,6 +85,7 @@ void httpInit() {
     //             esp_http_client_get_status_code(client),
     //             esp_http_client_get_content_length(client));
     // }
+
     esp_http_client_cleanup(client);
 }
 
