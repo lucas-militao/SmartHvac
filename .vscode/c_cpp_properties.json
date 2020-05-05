@@ -70,7 +70,8 @@
                 "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/host/services/gap/include",
                 "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/host/services/gatt/include",
                 "C:/esp/esp-idf/components/mqtt/esp-mqtt/include",
-                "${workspaceFolder}/components/moduleDs18b20/include"
+                "${workspaceFolder}/components/moduleDs18b20/include",
+                "C:/esp/esp-idf/components/newlib/platform_include"
             ],
             "defines": [],
             "cStandard": "c11",
