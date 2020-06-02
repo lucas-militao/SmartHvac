@@ -23,7 +23,7 @@
 
 #define SENSOR_DOOR_PIN 25 
 
-#define APIKEY "5X325YJIBLGZCD2O"     //  Enter your Write API key from ThingSpeak
+#define APIKEY "NZ6A8TG0MDBQYT0V"     //  Enter your Write API key from ThingSpeak
 const char *server = "api.thingspeak.com";
 
 static const char *TAG = "UNI";
@@ -134,10 +134,14 @@ void http_get_task_thingspeak(void *pvParameters)
 
         ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
         close(s);
-        for(int countdown = 10; countdown >= 0; countdown--) {
+        for(int countdown = 30; countdown >= 0; countdown--) {
             ESP_LOGI(TAG, "%d... ", countdown);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
+
         }
+
+        value1 = ds18b20_get_temp();
+        value2 = gpio_get_level(SENSOR_DOOR_PIN);
         ESP_LOGI(TAG, "Starting again!\n\n");
     }
 }

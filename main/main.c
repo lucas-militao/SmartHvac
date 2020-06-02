@@ -39,6 +39,18 @@ void configPresenceSensor()
   gpio_set_level(SENSOR_DOOR_PIN, isOn);
 }
 
+void printSensors()
+{
+  while (true)
+  {
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    printf("Door sensor: %d\n", gpio_get_level(SENSOR_DOOR_PIN));
+    printf("Temperature: %0.2f\n", ds18b20_get_temp());
+  }
+  
+  
+}
+
 void app_main()
 {
     ds18b20_init(TEMPERATURE_SENSOR_PIN);
