@@ -24,7 +24,15 @@
 #define SENSOR_DOOR_PIN 25 
 
 #define APIKEY "NZ6A8TG0MDBQYT0V"     //  Enter your Write API key from ThingSpeak
+
 const char *server = "api.thingspeak.com";
+
+//store the sensor values
+xQueueHandle queueDoorSensor;
+xQueueHandle queueTemperatureSensor;
+
+TaskHandle_t taskHandleDoorSensor;
+TaskHandle_t taskHandleTemperatureSensor;
 
 static const char *TAG = "UNI";
 
@@ -107,11 +115,13 @@ void http_get_task_thingspeak(void *pvParameters)
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             continue;
         }
+
         ESP_LOGI(TAG, "... socket send success\n\n");
 
         struct timeval receiving_timeout;
         receiving_timeout.tv_sec = 5;
         receiving_timeout.tv_usec = 0;
+
         if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &receiving_timeout,
                 sizeof(receiving_timeout)) < 0) {
             ESP_LOGE(TAG, "... failed to set socket receiving timeout");
@@ -119,6 +129,7 @@ void http_get_task_thingspeak(void *pvParameters)
             vTaskDelay(4000 / portTICK_PERIOD_MS);
             continue;
         }
+
         ESP_LOGI(TAG, "... set socket receiving timeout success\n\n");
 
         /* Read HTTP response */
@@ -134,14 +145,33 @@ void http_get_task_thingspeak(void *pvParameters)
 
         ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d\r\n", r, errno);
         close(s);
-        for(int countdown = 30; countdown >= 0; countdown--) {
-            ESP_LOGI(TAG, "%d... ", countdown);
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
 
+        // for(int countdown = 30; countdown >= 0; countdown--) {
+        //     ESP_LOGI(TAG, "%d... ", countdown);
+        //     vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // }
+
+        // value1 = ds18b20_get_temp();
+        // value2 = gpio_get_level(SENSOR_DOOR_PIN);
+
+        uint32_t rxTemperature = 0;
+        uint32_t rxDoor = 0;
+
+        xTaskNotifyGive(taskHandleDoorSensor);
+        if (xQueueReceive(queueDoorSensor, &rxDoor, 1000 / portTICK_PERIOD_MS))
+        {
+            printf("%d \n", rxDoor);
+            value2 = rxDoor;
         }
 
-        value1 = ds18b20_get_temp();
-        value2 = gpio_get_level(SENSOR_DOOR_PIN);
+        xTaskNotifyGive(taskHandleTemperatureSensor);
+        if (xQueueReceive(queueTemperatureSensor, &rxTemperature, 1000 / portTICK_PERIOD_MS))
+        {
+            value1 = rxTemperature;
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        
         ESP_LOGI(TAG, "Starting again!\n\n");
     }
 }
